@@ -61,6 +61,10 @@ int main(int argc, char *argv[]) {
 			/* play turn */
 			playGame(i, cardcnt);
 			if (finishGame()) break;
+
+			/* print dealer result */
+			if (i == n_user)
+				printDealerResult();
 		}
 		if (gameEnd == 1) break;
 

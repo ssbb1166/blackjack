@@ -128,23 +128,30 @@ void betDollar(int user) {
 			return;
 	}
 	/* players' betting */
-	bet[user] = rand() % N_MAX_BET + 1;
+	do {
+		bet[user] = rand() % N_MAX_BET + 1;
+	} while (bet[user] > dollar[user]);
 	printf("   -> player%d bets $%d (out of $%d)\n", user, bet[user], dollar[user]);
 }
 
+/* offering initial 2 cards */
 void offerCards(void) {
 	int i;
-	//1. give two card for each players
-	for (i=0;i<n_user;i++)
-	{
+	/* return when there are not enough cards to offer */
+	if (cardIndex >= N_CARDSET * N_CARD - (n_user + 1) * 2) {
+		cardIndex = N_CARDSET * N_CARD;
+		return;
+	}
+	/* give the first card */
+	cardhold[n_user][0] = pullCard();
+	for (i = 0; i < n_user; i++) {
 		cardhold[i][0] = pullCard();
+	}
+	/* give the second card */
+	cardhold[n_user][1] = pullCard();
+	for (i = 0; i < n_user; i++) {
 		cardhold[i][1] = pullCard();
 	}
-	//2. give two card for the operator
-	cardhold[n_user][0] = pullCard();
-	cardhold[n_user][1] = pullCard();
-
-	return;
 }
 
 /* print initial card status */
@@ -262,11 +269,23 @@ int calcStepResult(int user, int cardcnt) {
 		return 1;
 	/* over 21 */
 	else if (cardSum[user] > 21) {
+		/* A => 1 */
+		if (ace > 0) {
+			while (cardSum[user] > 21 && ace > 0) {
+				cardSum[user] -= 10;
+				ace--;
+			}
+			if (cardSum[user] < 21)
+				return 1;
+		}
 		return 2;
 	}
 	/* blackjack */
-	else if (cardSum[user] == 21)
+	else if (cardSum[user] == 21 && cardcnt == 2)
 		return 3;
+	/* 21 but not blackjack */
+	else if (cardSum[user] == 21)
+		return 1;
 	/* error */
 	else
 		return -1;
@@ -291,6 +310,29 @@ void checkResult(int user, int result) {
 		break;
 	case 3:
 		printf("BlackJack! win ($%d)\n", dollar[user] += 2 * bet[user]);
+		break;
+	}
+
+	if (dollar[user] == 0) {
+		if (user == 0)
+			printf("   -> you are bankrupted! game will be ended\n");
+		else
+			printf("   -> player%d is bankrupted! game will be ended\n", user);
+		gameEnd = 1;
+	}
+}
+
+/* print dealer result */
+void printDealerResult() {
+	switch (result[n_user]) {
+	case 1:
+		printf("[[[[[[[ server result is ....  %d ]]]]]]]\n", cardSum[n_user]);
+		break;
+	case 2:
+		printf("[[[[[[[ server result is .... ....overflow!! ]]]]]]]\n");
+		break;
+	case 3:
+		printf("[[[[[[[ server result is ....Blackjack, T_T all remained players lose! ]]]]]]]\n");
 		break;
 	}
 }

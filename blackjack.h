@@ -30,6 +30,7 @@ int getAction(int user, int cardcnt);
 void printUserCardStatus(int user, int cardcnt);
 int calcStepResult(int user, int cardcnt);
 void checkResult(int user, int result);
+void printDealerResult(void);
 void checkWinner(void);
 int isEmptyTray(void);
 int finishGame(void);

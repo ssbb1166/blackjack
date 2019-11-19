@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
 
 		printf("\n------------------ GAME start --------------------------\n");
 		/* each player's turn */
-		for (user = 0; user <= n_user; user++)  /* each player: 0(me) ~ dealer(n_user) */
+		for (user = 0; user <= n_user; user++)  /* each player: 0(me) ~ n_user(dealer) */
 		{
 			int cardcnt = 2;  /* initial card count */
 

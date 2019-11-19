@@ -23,11 +23,11 @@ int gameEnd = 0;                               /* game end flag */
 /* calculate the actual card number in the blackjack game */
 int getCardNum(int cardnum) {
 	/* ------------------------------------------------------------
-	 * A(1): return 11
-	 *       if the sum exceeds 21, the actual number is 1
-	 *       calcStepResult() function will calculate it
-	 * 2~10: return 2~10
-	 * J(11), Q(12), K(13): return 10
+	 *       A : return 11
+	 *           (If the sum exceeds 21, the actual number is 1.
+	 *           calcStepResult() function will calculate it.)
+	 *  2 ~ 10 : return 2 ~ 10
+	 * J, Q, K : return 10
 	 * ------------------------------------------------------------ */
 	int facevalue = cardnum % 100;
 	switch (facevalue) {
@@ -52,6 +52,7 @@ void printCard(int cardnum) {
 	 * ------------------------------------------------------------ */
 	int suitvalue = cardnum / 100;
 	int facevalue = cardnum % 100;
+	/* print suit value */
 	switch (suitvalue) {
 	case 1:
 		printf("CLV");
@@ -66,6 +67,7 @@ void printCard(int cardnum) {
 		printf("SPD");
 		break;
 	}
+	/* print face value */
 	switch (facevalue) {
 	case 11:
 		printf("Jack ");
@@ -245,7 +247,7 @@ int getAction(int user, int cardcnt) {
 	 * GO: return 1, STOP: return 0
 	 * ------------------------------------------------------------ */
 	/* 21 but not blackjack */
-    if (cardSum[user] == 21 && cardcnt > 2) {
+	if (cardSum[user] == 21 && cardcnt > 2) {
 		printf("\n");
 		return 0;
 	}

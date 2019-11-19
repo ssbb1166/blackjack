@@ -11,11 +11,11 @@ void swap(int *x, int *y) {
 
 /* get an integer input */
 int getIntegerInput(void) {
-    /* ------------------------------------------------------------
-     * get an integer input from standard input (keyboard)
-     * return: input integer value
-     *         (-1 is returned if keyboard input was not integer)
-     * ------------------------------------------------------------ */
+	/* ------------------------------------------------------------
+	 * get an integer input from standard input (keyboard)
+	 * return: input integer value
+	 *         (-1 is returned if keyboard input was not integer)
+	 * ------------------------------------------------------------ */
 	int input, num;
 
 	num = scanf("%d", &input);

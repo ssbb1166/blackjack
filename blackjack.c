@@ -22,19 +22,22 @@ int gameEnd = 0;                               /* game end flag */
 
 /* calculate the actual card number in the blackjack game */
 int getCardNum(int cardnum) {
-    /* ------------------------------------------------------------
-     * A(1): return 11
-     *       if the sum exceeds 21, the actual number is 1
-     *       calcStepResult() function will calculate it
-     * 2~10: return 2~10
-     * J(11), Q(12), K(13): return 10
-     * ------------------------------------------------------------ */
+	/* ------------------------------------------------------------
+	 * A(1): return 11
+	 *       if the sum exceeds 21, the actual number is 1
+	 *       calcStepResult() function will calculate it
+	 * 2~10: return 2~10
+	 * J(11), Q(12), K(13): return 10
+	 * ------------------------------------------------------------ */
 	int facevalue = cardnum % 100;
 	switch (facevalue) {
-	case 1:						/* A => 11 */
+	/* A => 11 */
+	case 1:
 		return 11;
-	case 11: case 12: case 13:	/* J, Q, K => 10 */
+	/* J, Q, K => 10 */
+	case 11: case 12: case 13:
 		return 10;
+	/* other */
 	default:
 		return cardnum % 100;
 	}
@@ -42,7 +45,7 @@ int getCardNum(int cardnum) {
 
 /* print the card information (e.g. DiaA) */
 void printCard(int cardnum) {
-	/* ------------------------------------------------------------
+	 /* ------------------------------------------------------------
 	 * suitvalue: CLV=1, DIA=2, HRT=3, SPD=4
 	 * facevalue: ACE=1, ... , JACK=11, QUEEN=12, KING=13
 	 * ex) CLVAce=101, DIA8=208, HRTQueen=312, SPD6=406
@@ -100,7 +103,7 @@ void mixCardTray(void) {
 
 /* get one card from the tray */
 int pullCard(void) {
-    /* ------------------------------------------------------------
+	/* ------------------------------------------------------------
 	 * return: first card remaining in the card tray
 	 * ------------------------------------------------------------ */
 	return CardTray[cardIndex++];
@@ -111,7 +114,7 @@ int pullCard(void) {
 
 /* player settiing */
 int configUser(void) {
-    /* ------------------------------------------------------------
+	/* ------------------------------------------------------------
 	 * return: input integer value
 	 * ------------------------------------------------------------ */
 	int num;
@@ -185,8 +188,8 @@ void printCardInitialStatus(void) {
 
 /* play game */
 void playGame(int user, int cardcnt) {
-    /* ------------------------------------------------------------
-     * get action, calculate the card sum and save result
+	/* ------------------------------------------------------------
+	 * get action, calculate the card sum and save result
 	 * result 1: STOP, result 2: DEAD, result 3: blackjack
 	 * ------------------------------------------------------------ */
 	if (user == 0)
@@ -202,7 +205,7 @@ void playGame(int user, int cardcnt) {
 
 		/* check the card status */
 		if (calcStepResult(user, cardcnt) == 1)  /* under 21 */
-        {
+		{
 			/* get action (GO? STOP?) */
 			if (getAction(user, cardcnt) == 1) {
 				cardcnt++;
@@ -212,7 +215,7 @@ void playGame(int user, int cardcnt) {
 			break;
 		}
 		else if (calcStepResult(user, cardcnt) == 2)  /* over 21 */
-        {
+		{
 			result[user] = 2;  /* result 2: DEAD */
 			if (user == n_user)
 				printf("server DEAD (sum:%d)\n", cardSum[user]);
@@ -222,7 +225,7 @@ void playGame(int user, int cardcnt) {
 			break;
 		}
 		else if (calcStepResult(user, cardcnt) == 3)  /* blackjack */
-        {
+		{
 			result[user] = 3;  /* result 3: blackjack */
 			if (user == n_user)
 				printf("Black Jack!T_T... server win\n");
@@ -236,19 +239,19 @@ void playGame(int user, int cardcnt) {
 
 /* get action */
 int getAction(int user, int cardcnt) {
-    /* ------------------------------------------------------------
+	/* ------------------------------------------------------------
 	 * your turn: get an integer to decide whether to GO or STOP
 	 * computer player's turn: GO less than 17, STOP more than 17
 	 * GO: return 1, STOP: return 0
 	 * ------------------------------------------------------------ */
-    /* 21 but not blackjack */
+	/* 21 but not blackjack */
     if (cardSum[user] == 21 && cardcnt > 2) {
 		printf("\n");
 		return 0;
 	}
 	/* players' turn */
 	if (user == 0)  /* your turn */
-    {
+	{
 		printf("Action? (0 - go, others - stay) :");
 		if (getIntegerInput() == 0) {
 			cardhold[user][cardcnt] = pullCard();
@@ -258,7 +261,7 @@ int getAction(int user, int cardcnt) {
 			return 0;
 	}
 	else  /* computer player's turn */
-    {
+	{
 		if (cardSum[user] < N_MAX_GO) {
 			printf("GO!\n");
 			cardhold[user][cardcnt] = pullCard();
@@ -282,7 +285,7 @@ void printUserCardStatus(int user, int cardcnt) {
 
 /* calculate the card sum and see if : 1. under 21, 2. over 21, 3. blackjack */
 int calcStepResult(int user, int cardcnt) {
-    /* ------------------------------------------------------------
+	/* ------------------------------------------------------------
 	 * calculate the card sum for each user and return one of 1~3
 	 * if the sum exceeds 21, check if there is an ACE card
 	 * under 21: return 1, over 21: return 2, blackjack return 3
@@ -324,7 +327,7 @@ int calcStepResult(int user, int cardcnt) {
 
 /* print round result */
 void checkResult(int user, int result) {
-    /* ------------------------------------------------------------
+	/* ------------------------------------------------------------
 	 * print the result of each round and calculate the bet amount
 	 * ------------------------------------------------------------ */
 	if (user == 0)
@@ -332,7 +335,7 @@ void checkResult(int user, int result) {
 	else
 		printf("   -> %d'th player's result : ", user);
 
-    /* result 1: STOP, 2: DEAD, 3: blackjack  */
+	/* result 1: STOP, 2: DEAD, 3: blackjack  */
 	switch (result) {
 	case 1:
 		if (cardSum[user] >= cardSum[n_user] || cardSum[n_user] > 21)
@@ -347,7 +350,7 @@ void checkResult(int user, int result) {
 		printf("BlackJack! win ($%d)\n", dollar[user] += 2 * bet[user]);
 		break;
 	}
-	
+
 	/* if the player went bankrupt */
 	if (dollar[user] == 0) {
 		if (user == 0)
@@ -375,7 +378,7 @@ void printDealerResult() {
 
 /* print final winner */
 void checkWinner() {
-    /* ------------------------------------------------------------
+	/* ------------------------------------------------------------
 	 * compare the money and print the winner
 	 * ------------------------------------------------------------ */
 	int i, winner = 0;
@@ -393,7 +396,7 @@ void checkWinner() {
 
 /* check game finish */
 int finishGame() {
-    /* ------------------------------------------------------------
+	/* ------------------------------------------------------------
 	 * print the game end message
 	 * ------------------------------------------------------------ */
 	if (isEmptyTray()) {

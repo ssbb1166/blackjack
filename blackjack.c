@@ -2,26 +2,33 @@
 #include <stdlib.h>
 #include "blackjack.h"
 
-/* card tray object --------------------------------- */
+/* card tray object ===================================================== */
 int CardTray[N_CARDSET*N_CARD];
 int cardIndex = 0;
 
-/* player info -------------------------------------- */
-int dollar[N_MAX_USER];							/* dollars that each player has */
-int n_user;										/* number of users */
+/* player info ========================================================== */
+int dollar[N_MAX_USER];                        /* dollars that each player has */
+int n_user;                                    /* number of users */
 
-/* play yard information ---------------------------- */
-int cardhold[N_MAX_USER + 1][N_MAX_CARDHOLD];	/* cards that currently the players hold */
-int cardSum[N_MAX_USER + 1];		 			/* sum of the cards */
-int bet[N_MAX_USER];							/* current betting */
-int result[N_MAX_USER + 1];						/* round result */
-int gameEnd = 0; 								/* game end flag */
+/* play yard information ================================================ */
+int cardhold[N_MAX_USER + 1][N_MAX_CARDHOLD];  /* cards that currently the players hold */
+int cardSum[N_MAX_USER + 1];                   /* sum of the cards */
+int bet[N_MAX_USER];                           /* current betting */
+int result[N_MAX_USER + 1];                    /* round result */
+int gameEnd = 0;                               /* game end flag */
 
 
-/* card processing functions ------------------------ */
+/* card processing functions ============================================ */
 
 /* calculate the actual card number in the blackjack game */
 int getCardNum(int cardnum) {
+    /* ------------------------------------------------------------
+     * A(1): return 11
+     *       if the sum exceeds 21, the actual number is 1
+     *       calcStepResult() function will calculate it
+     * 2~10: return 2~10
+     * J(11), Q(12), K(13): return 10
+     * ------------------------------------------------------------ */
 	int facevalue = cardnum % 100;
 	switch (facevalue) {
 	case 1:						/* A => 11 */
@@ -72,7 +79,7 @@ void printCard(int cardnum) {
 }
 
 
-/* card array controllers --------------------------- */
+/* card array controllers =============================================== */
 
 /* mix the card sets and put in the array */
 void mixCardTray(void) {
@@ -93,14 +100,20 @@ void mixCardTray(void) {
 
 /* get one card from the tray */
 int pullCard(void) {
+    /* ------------------------------------------------------------
+	 * return: first card remaining in the card tray
+	 * ------------------------------------------------------------ */
 	return CardTray[cardIndex++];
 }
 
 
-/* playing game functions --------------------------- */
+/* playing game functions =============================================== */
 
 /* player settiing */
 int configUser(void) {
+    /* ------------------------------------------------------------
+	 * return: input integer value
+	 * ------------------------------------------------------------ */
 	int num;
 	while (1) {
 		printf("Input the number of players (MAX:%d): ", N_MAX_USER);
@@ -172,6 +185,10 @@ void printCardInitialStatus(void) {
 
 /* play game */
 void playGame(int user, int cardcnt) {
+    /* ------------------------------------------------------------
+     * get action, calculate the card sum and save result
+	 * result 1: STOP, result 2: DEAD, result 3: blackjack
+	 * ------------------------------------------------------------ */
 	if (user == 0)
 		printf(">>> my turn! -------------\n");
 	else if (user == n_user)
@@ -184,17 +201,19 @@ void playGame(int user, int cardcnt) {
 		printUserCardStatus(user, cardcnt);
 
 		/* check the card status */
-		if (calcStepResult(user, cardcnt) == 1) {
+		if (calcStepResult(user, cardcnt) == 1)  /* under 21 */
+        {
 			/* get action (GO? STOP?) */
 			if (getAction(user, cardcnt) == 1) {
 				cardcnt++;
 				continue;
 			}
-			result[user] = 1;  /* STOP */
+			result[user] = 1;  /* result 1: STOP */
 			break;
 		}
-		else if (calcStepResult(user, cardcnt) == 2) {
-			result[user] = 2;  /* DEAD */
+		else if (calcStepResult(user, cardcnt) == 2)  /* over 21 */
+        {
+			result[user] = 2;  /* result 2: DEAD */
 			if (user == n_user)
 				printf("server DEAD (sum:%d)\n", cardSum[user]);
 			else
@@ -202,8 +221,9 @@ void playGame(int user, int cardcnt) {
 					cardSum[user], bet[user], dollar[user] - bet[user]);
 			break;
 		}
-		else if (calcStepResult(user, cardcnt) == 3) {
-			result[user] = 3;  /* blackjack */
+		else if (calcStepResult(user, cardcnt) == 3)  /* blackjack */
+        {
+			result[user] = 3;  /* result 3: blackjack */
 			if (user == n_user)
 				printf("Black Jack!T_T... server win\n");
 			else
@@ -216,13 +236,19 @@ void playGame(int user, int cardcnt) {
 
 /* get action */
 int getAction(int user, int cardcnt) {
-	/* 21 but not blackjack */
-	if (cardSum[user] == 21 && cardcnt > 2) {
+    /* ------------------------------------------------------------
+	 * your turn: get an integer to decide whether to GO or STOP
+	 * computer player's turn: GO less than 17, STOP more than 17
+	 * GO: return 1, STOP: return 0
+	 * ------------------------------------------------------------ */
+    /* 21 but not blackjack */
+    if (cardSum[user] == 21 && cardcnt > 2) {
 		printf("\n");
 		return 0;
 	}
-	/* your turn */
-	if (user == 0) {
+	/* players' turn */
+	if (user == 0)  /* your turn */
+    {
 		printf("Action? (0 - go, others - stay) :");
 		if (getIntegerInput() == 0) {
 			cardhold[user][cardcnt] = pullCard();
@@ -231,9 +257,8 @@ int getAction(int user, int cardcnt) {
 		else
 			return 0;
 	}
-	/* computer player's turn */
-	/* GO: less than 17, STOP: more than 17 */
-	else {
+	else  /* computer player's turn */
+    {
 		if (cardSum[user] < N_MAX_GO) {
 			printf("GO!\n");
 			cardhold[user][cardcnt] = pullCard();
@@ -257,6 +282,12 @@ void printUserCardStatus(int user, int cardcnt) {
 
 /* calculate the card sum and see if : 1. under 21, 2. over 21, 3. blackjack */
 int calcStepResult(int user, int cardcnt) {
+    /* ------------------------------------------------------------
+	 * calculate the card sum for each user and return one of 1~3
+	 * if the sum exceeds 21, check if there is an ACE card
+	 * under 21: return 1, over 21: return 2, blackjack return 3
+	 * (-1 is returned if an error occurs)
+	 * ------------------------------------------------------------ */
 	int i, ace = 0;
 	cardSum[user] = 0;
 	for (i = 0; i < cardcnt; i++) {
@@ -269,7 +300,7 @@ int calcStepResult(int user, int cardcnt) {
 		return 1;
 	/* over 21 */
 	else if (cardSum[user] > 21) {
-		/* A => 1 */
+		/* A: 11 => 1 */
 		if (ace > 0) {
 			while (cardSum[user] > 21 && ace > 0) {
 				cardSum[user] -= 10;
@@ -293,11 +324,15 @@ int calcStepResult(int user, int cardcnt) {
 
 /* print round result */
 void checkResult(int user, int result) {
+    /* ------------------------------------------------------------
+	 * print the result of each round and calculate the bet amount
+	 * ------------------------------------------------------------ */
 	if (user == 0)
 		printf("   -> your result : ");
 	else
 		printf("   -> %d'th player's result : ", user);
 
+    /* result 1: STOP, 2: DEAD, 3: blackjack  */
 	switch (result) {
 	case 1:
 		if (cardSum[user] >= cardSum[n_user] || cardSum[n_user] > 21)
@@ -312,7 +347,8 @@ void checkResult(int user, int result) {
 		printf("BlackJack! win ($%d)\n", dollar[user] += 2 * bet[user]);
 		break;
 	}
-
+	
+	/* if the player went bankrupt */
 	if (dollar[user] == 0) {
 		if (user == 0)
 			printf("   -> you are bankrupted! game will be ended\n");
@@ -339,6 +375,9 @@ void printDealerResult() {
 
 /* print final winner */
 void checkWinner() {
+    /* ------------------------------------------------------------
+	 * compare the money and print the winner
+	 * ------------------------------------------------------------ */
 	int i, winner = 0;
 	printf("game end! your money : $%d, players' money : ", dollar[0]);
 	for (i = 1; i < n_user; i++) {
@@ -354,6 +393,9 @@ void checkWinner() {
 
 /* check game finish */
 int finishGame() {
+    /* ------------------------------------------------------------
+	 * print the game end message
+	 * ------------------------------------------------------------ */
 	if (isEmptyTray()) {
 		printf("card ran out of the tray!! finishing the game...\n\n\n");
 		gameEnd = 1;

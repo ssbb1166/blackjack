@@ -22,7 +22,7 @@ extern int gameEnd;                                   /* game end flag */
 
 /* main ================================================================= */
 int main(int argc, char *argv[]) {
-    int user, roundIndex = 0;
+	int user, roundIndex = 0;
 
 	srand((unsigned)time(NULL));
 

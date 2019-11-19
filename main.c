@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <windows.h>
 #include "blackjack.h"
 
 /* card tray object ===================================================== */
@@ -81,7 +80,7 @@ int main(int argc, char *argv[]) {
 	printf("\n -------------------------------------------\n");
 	printf("\n -------------------------------------------\n");
 	checkWinner();
-	system("pause");
+	getchar();  /* keep console window open */
 
 	return 0;
 }
